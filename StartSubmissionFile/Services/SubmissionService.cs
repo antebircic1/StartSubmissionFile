@@ -13,13 +13,10 @@ namespace StartSubmissionFile.Services
 {
 	internal class SubmissionService
 	{
-
-		const string requestUri = "http://localhost:9108/api/payments/v1/Submission/StartSubmissionFile";
-
+		const string requestUri = "";
 		internal static async Task StartSubmissionFile()
 		{
 			using var context = new SubmissionDbContext();
-
 			try
 			{
 				var submissions = await context.Submission.Where(x => !x.IsGenerated).OrderBy(x=>x.Id).ToListAsync();
@@ -58,9 +55,11 @@ namespace StartSubmissionFile.Services
 			};
 			var jsonRequest = JsonConvert.SerializeObject(request);
 			var requestBody = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
+			string bearerToken = "";
 			SubmissionResponseDto? response;
 			try
 			{
+				httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
 				var res = await httpClient.PostAsync(requestUri, requestBody);
 				var jsonResponse = await res.Content.ReadAsStringAsync();
 				response = !String.IsNullOrEmpty(jsonResponse) ? JsonConvert.DeserializeObject<SubmissionResponseDto>(jsonResponse) : null;
